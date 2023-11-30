@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="https://yt3.ggpht.com/a/AGF-l78km1YyNXmF0r3-0CycCA0HLA_i6zYn_8NZEg=s900-c-k-c0xffffffff-no-rj-mo"
+      type="image/gif"
+      sizes="16x16"
+    />
+    <title>Authentication</title>
+    <style>
+      body {
+        text-align: center;
+        background-color: lightseagreen;
+        color: black;
+      }
+    </style>
+    <link href="./Auth.css" rel="stylesheet" type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="split left" id="authForm">
+      <div class="centered">
+        <div class="login-box">
+          <form>
+            <div class="user-box">
+              <input type="email" name="Email" id="userEmail" required="" />
+              <label>User Email</label>
+            </div>
+            <div class="user-box">
+              <input
+                type="password"
+                name="Password"
+                id="userPassword"
+                required=""
+              />
+              <label>User Password</label>
+            </div>
+            <a id="signUpButton" href="#">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              Sign Up
+            </a>
+            <a id="signInButton" href="#">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              Sign In
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="secretContent">
+      <div class="split right">
+        <div class="centered">
+          <div class="login-box textdata">
+            <form>
+              <div class="user-box">
+                <p id="para"></p>
+              <a id="" href="./index.html">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Click to continue
+              </a>
+              <a id="signOutButton" href="">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Sign out
+              </a>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBMVtwPkx2qGKMk9asRQ1KCyy6rrTqUWC8",
+        authDomain: "sem-7-7f4e0.firebaseapp.com",
+        databaseURL: "https://sem-7-7f4e0-default-rtdb.firebaseio.com",
+        projectId: "sem-7-7f4e0",
+        storageBucket: "sem-7-7f4e0.appspot.com",
+        messagingSenderId: "87825354829",
+        appId: "1:87825354829:web:2bb419542ca258fb84cc04",
+        measurementId: "G-DZDCQLJ3C9"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      const userEmail = document.querySelector("#userEmail");
+      const userPassword = document.querySelector("#userPassword");
+      const authForm = document.querySelector("#authForm");
+      const secretContent = document.querySelector("#secretContent");
+      const signUpButton = document.querySelector("#signUpButton");
+      const signInButton = document.querySelector("#signInButton");
+      const signOutButton = document.querySelector("#signOutButton");
+
+      secretContent.style.display = "none";
+
+      const userSignUp = async () => {
+        const signUpEmail = userEmail.value;
+        const signUpPassword = userPassword.value;
+        createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user);
+            document.getElementById('para').innerHTML="Your account has been created!";
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorCode + errorMessage);
+          });
+      };
+
+      const userSignIn = async () => {
+        const signInEmail = userEmail.value;
+        const signInPassword = userPassword.value;
+        signInWithEmailAndPassword(auth, signInEmail, signInPassword)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            document.getElementById('para').innerHTML=("You have signed in successfully!");
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorCode + errorMessage);
+          });
+      };
+
+      const checkAuthState = async () => {
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            authForm.style.display = "none";
+            secretContent.style.display = "block";
+          } else {
+            authForm.style.display = "block";
+            secretContent.style.display = "none";
+          }
+        });
+      };
+
+      const userSignOut = async () => {
+        await signOut(auth);
+      };
+
+      checkAuthState();
+
+      signUpButton.addEventListener("click", userSignUp);
+      signInButton.addEventListener("click", userSignIn);
+      signOutButton.addEventListener("click", userSignOut);
+    </script>
+  </body>
+</html>
